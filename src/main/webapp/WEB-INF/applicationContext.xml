@@ -1,0 +1,48 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+    <mvc:annotation-driven/>
+
+    <context:component-scan base-package="com.deferred.test" />
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="org.postgresql.Driver" />
+        <property name="jdbcUrl" value="jdbc:postgresql://localhost/teste" />
+        <property name="user" value="postgres" />
+        <property name="password" value="postgres" />
+
+        <property name="initialPoolSize" value="5" />
+        <property name="maxPoolSize" value="10" />
+        <property name="minPoolSize" value="10" />
+        <!-- Idle connection tests -->
+        <!-- remove from pool when idle for almost 8h. Should be less then 'wait_timeout'= default 28800 -->
+
+        <property name="unreturnedConnectionTimeout" value="20" />
+        <property name="debugUnreturnedConnectionStackTraces" value="true" />
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+
+        <property name="configLocation">
+            <value>classpath:/hibernate.cfg.xml</value>
+        </property>
+        <property name="packagesToScan">
+            <beans:array>
+                <value>com.deferred.test</value>
+            </beans:array>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="javax.persistence.validation.mode">none</prop>
+            </props>
+        </property>
+        <!--        &lt;!&ndash; 		moved interceptor creation to transaction manager - Tomasz Wilk &ndash;&gt;-->
+        <!--        <property name="entityInterceptor" ref="systemLogInterceptor" />-->
+    </bean>
+</beans>
